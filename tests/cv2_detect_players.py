@@ -9,7 +9,7 @@ import os
 import numpy as np
 
 # Reading the video
-vidcap = cv2.VideoCapture('videos/clip_2.mp4')
+vidcap = cv2.VideoCapture('../videos/clip_1.mp4')
 success, image = vidcap.read()
 count = 0
 success = True

@@ -73,6 +73,11 @@ while video.isOpened():
             y2 = y1 + 2 * (y2 - y1)
             cv2.line(image, (x1, y1), (x2, y2), (0, 0, 255), 2)
 
+    # # result is dilated for marking the corners, not important
+    # dst = cv2.dilate(image, None)
+    # # Threshold for an optimal value, it may vary depending on the image.
+    # image[dst > 0.9 * dst.max()] = 255
+
     # lines = cv2.HoughLinesP(edges, 1, np.pi / 180, 50, minLineLength=100, maxLineGap=15)
     # if lines is not None:
     #     for l in lines:
