@@ -8,13 +8,24 @@ https://docs.ultralytics.com/tutorials/pytorch-hub/
 
 import torch
 import cv2
+from pafy import pafy
 
 video_path = '../videos/clip_1.mp4'
 model_path = '../yolov5s.pt'
-video = cv2.VideoCapture(video_path)
 
 # model = torch.hub.load('ultralytics/yolov5', 'yolov5s')
 model = torch.hub.load('../../../../yolov5/', 'custom', path=model_path, source='local')
+
+
+def get_youtube_cap(url):
+    play = pafy.new(url).streams[-1] # we will take the lowest quality stream
+    assert play is not None # makes sure we get an error if the video failed to load
+    return cv2.VideoCapture(play.url)
+
+
+video = cv2.VideoCapture(video_path)
+# video = get_youtube_cap("https://www.youtube.com/watch?v=pO1Wt7t04QQ") # KOŠARKA
+# video = get_youtube_cap("https://www.youtube.com/watch?v=fQoJZuBwrkU") # FLAPPY BIRD
 
 while video.isOpened():
     ret, frame = video.read()
@@ -25,9 +36,6 @@ while video.isOpened():
     # Press q to exit video
     if cv2.waitKey(25) & 0xFF == ord('q'):
         break
-    l = 0
-    r = 150
-    frame=frame[l:l+640, r:r+640]
     results = model(frame)
 
     results.render()  # Draws bounding boxes for detections on given image
