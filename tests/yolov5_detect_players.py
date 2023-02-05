@@ -8,19 +8,19 @@ https://docs.ultralytics.com/tutorials/pytorch-hub/
 
 import torch
 import cv2
-from pafy import pafy
+# from pafy import pafy
 
 video_path = '../videos/clip_1.mp4'
-model_path = '../yolov5s.pt'
+model_path = '../models/yolov5s.pt'
 
 # model = torch.hub.load('ultralytics/yolov5', 'yolov5s')
 model = torch.hub.load('../../../../yolov5/', 'custom', path=model_path, source='local')
 
 
-def get_youtube_cap(url):
-    play = pafy.new(url).streams[-1] # we will take the lowest quality stream
-    assert play is not None # makes sure we get an error if the video failed to load
-    return cv2.VideoCapture(play.url)
+# def get_youtube_cap(url):
+#     play = pafy.new(url).streams[-1] # we will take the lowest quality stream
+#     assert play is not None # makes sure we get an error if the video failed to load
+#     return cv2.VideoCapture(play.url)
 
 
 video = cv2.VideoCapture(video_path)
