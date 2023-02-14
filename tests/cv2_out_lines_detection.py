@@ -220,7 +220,6 @@ def assign_sides(lines):
         if theta > 0.53:
             s = 'l'
         elif theta > 0.48:
-            print(theta)
             s = 't'
         else:
             s = 'r'
@@ -242,7 +241,7 @@ def assign_sides(lines):
 
 
 def main():
-    video_path = '../videos/clip_3.mp4'
+    video_path = '../videos/clip_1.mp4'
     video = cv2.VideoCapture(video_path)
 
     # Read the video frame by frame

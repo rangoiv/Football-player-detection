@@ -1,15 +1,20 @@
-
 import cv2
 
 
-def concat(frame, pitch_image):
+def concat(frame, pitch_image, direction: chr = 'v'):
     height, width, _ = pitch_image.shape
     fheight, fwidth, _ = frame.shape
 
-    fheight = int(fheight * width/fwidth)
-    fwidth = int(width)
+    if direction == 'v':
+        fheight = int(fheight * width / fwidth)
+        fwidth = int(width)
+        cv2concat = cv2.vconcat
+    else:
+        fwidth = int(fwidth * height / fheight)
+        fheight = int(height)
+        cv2concat = cv2.hconcat
     resized = cv2.resize(frame, (fwidth, fheight), interpolation=cv2.INTER_AREA)
-    concated = cv2.vconcat([resized, pitch_image])
+    concated = cv2concat([resized, pitch_image])
     return concated
 
 
