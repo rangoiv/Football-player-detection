@@ -1,8 +1,7 @@
+import math
+
 import cv2
 import numpy as np
-
-video_path = '../videos/clip_1.mp4'
-video = cv2.VideoCapture(video_path)
 
 
 def line_intersect(line_A, line_B, segment=True):
@@ -89,7 +88,7 @@ def resize(green, dim):
     return resized
 
 
-def cumulative(green):
+def cumulative_green(green):
     new_green = np.ndarray(green.shape, dtype=int)
     new_green[0] = [int(bool(g)) for g in green[0]]
     for i in range(1, len(green)):
@@ -108,12 +107,12 @@ def fill_in_holes(green):
     return green
 
 
-def get_top_lines(green, lines):
+def filter_top_lines(green, lines):
     xl = green.shape[1]-1
     yl = green.shape[0]-1
     green = fill_in_holes(green)
     green = resize(green, (200, 200))
-    green = cumulative(green)
+    green = cumulative_green(green)
     g = sum(green[-1])
 
     def resize_line(line):
@@ -183,7 +182,69 @@ def get_top_lines(green, lines):
     return best[1]
 
 
+def get_top_lines(image):
+    hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+    lower_green = np.array([40, 40, 40])
+    upper_green = np.array([70, 255, 255])
+    bitwise = cv2.bitwise_and(image, image, mask=cv2.inRange(hsv, lower_green, upper_green))
+    edges = cv2.Canny(bitwise, 100, 200)
+    green = cv2.inRange(hsv, lower_green, upper_green)
+    green = fill_in_holes(green)
+    # edges = cv2.Canny(green, 100, 200)
+    lines = cv2.HoughLines(edges, 1, np.pi * 1 / 180, 150)
+    lines = get_lines(lines)
+    lines = clip_lines(image, lines)
+    # image = cv2.cvtColor(green, cv2.COLOR_GRAY2RGB)
+    # for ((x1, y1), (x2, y2)) in lines:
+    #     cv2.line(image, (x1, y1), (x2, y2), (0, 0, 255), 1)
+    lines = filter_top_lines(green, lines)
+    return lines
+
+
+def assign_sides(lines):
+    new_lines = []
+    for ((x1, y1), (x2, y2)) in lines:
+        if x2 < x1:
+            (x1, y1), (x2, y2) = (x2, y2), (x1, y1)
+        x, y = x2 - x1, y2 - y1
+        if y == 0:
+            theta = 0.5
+        else:
+            theta = math.atan(x/y) / math.pi
+            if theta < 0:
+                theta = theta+1
+        new_lines.append(((x1, y1), (x2, y2), theta))
+    # 1)
+    if len(lines) == 1:
+        ((x1, y1), (x2, y2), theta) = new_lines[0]
+        if theta > 0.53:
+            s = 'l'
+        elif theta > 0.48:
+            print(theta)
+            s = 't'
+        else:
+            s = 'r'
+        return [((x1, y1), (x2, y2), s)]
+    elif len(lines) == 2:
+        (start_1, end_1, theta_1) = new_lines[0]
+        (start_2, end_2, theta_2) = new_lines[1]
+        if start_2[0] < start_1[0]:
+            start_1, end_1, theta_1, start_2, end_2, theta_2 = start_2, end_2, theta_2, start_1, end_1, theta_1
+        if theta_1 > 0.53 or theta_2 > 0.5:
+            s1 = 'l'
+            s2 = 't'
+        else:
+            s1 = 't'
+            s2 = 'r'
+        return [(start_1, end_1, s1), (start_2, end_2, s2)]
+    else:
+        raise RuntimeWarning("Error")
+
+
 def main():
+    video_path = '../videos/clip_3.mp4'
+    video = cv2.VideoCapture(video_path)
+
     # Read the video frame by frame
     while video.isOpened():
         ret, image = video.read()
@@ -192,26 +253,17 @@ def main():
         if cv2.waitKey(25) & 0xFF == ord('q'):
             break
 
-        hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-        lower_green = np.array([40, 40, 40])
-        upper_green = np.array([70, 255, 255])
-        bitwise = cv2.bitwise_and(image, image, mask=cv2.inRange(hsv, lower_green, upper_green))
-        edges = cv2.Canny(bitwise, 100, 200)
+        lines = get_top_lines(image)
+        lines = assign_sides(lines)
 
-        green = cv2.inRange(hsv, lower_green, upper_green)
-        green = fill_in_holes(green)
-        # edges = cv2.Canny(green, 100, 200)
-
-        lines = cv2.HoughLines(edges, 1, np.pi * 1 / 180, 150)
-        lines = get_lines(lines)
-        lines = clip_lines(image, lines)
-        # image = cv2.cvtColor(green, cv2.COLOR_GRAY2RGB)
-        # for ((x1, y1), (x2, y2)) in lines:
-        #     cv2.line(image, (x1, y1), (x2, y2), (0, 0, 255), 1)
-        lines = get_top_lines(green, lines)
-
-        for ((x1, y1), (x2, y2)) in lines:
-            cv2.line(image, (x1, y1), (x2, y2), (0, 0, 255), 2)
+        for ((x1, y1), (x2, y2), s) in lines:
+            if s == 't':
+                col = (0, 0, 255)
+            elif s == 'l':
+                col = (0, 255, 0)
+            else:
+                col = (255, 0, 0)
+            cv2.line(image, (x1, y1), (x2, y2), col, 2)
 
         # cv2.imshow('Match Detection', cumulative(resize(green, (200, 200))).astype(np.uint8))
         cv2.imshow('Match Detection', image)
@@ -219,4 +271,6 @@ def main():
     video.release()
     cv2.destroyAllWindows()
 
-main()
+
+if __name__ == "__main__":
+    main()

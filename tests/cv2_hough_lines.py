@@ -49,7 +49,7 @@ while video.isOpened():
     # res_bgr = cv2.cvtColor(res1, cv2.COLOR_HSV2BGR)
     # res_gray = cv2.cvtColor(res1, cv2.COLOR_BGR2GRAY)
     #
-    edges = cv2.Canny(green,100,200)
+    edges = cv2.Canny(green, 100, 200)
     # sobelxy = cv2.Sobel(src=white, ddepth=cv2.CV_64F, dx=12, dy=12, ksize=25)
 
     # cv2.imshow('Match Detection', res)
@@ -69,7 +69,7 @@ while video.isOpened():
             y1 = int(y0 + 1000 * (a))
             x2 = int(x0 - 1000 * (-b))
             y2 = int(y0 - 1000 * (a))
-            x2 = x1 + 2*(x2-x1)
+            x2 = x1 + 2 * (x2 - x1)
             y2 = y1 + 2 * (y2 - y1)
             cv2.line(image, (x1, y1), (x2, y2), (0, 0, 255), 2)
 
@@ -85,7 +85,6 @@ while video.isOpened():
     #         cv2.line(image, (l[0], l[1]), (l[2], l[3]), (0,0,255), 3, cv2.LINE_AA)
 
     cv2.imshow('Match Detection', image)
-
 
 video.release()
 cv2.destroyAllWindows()
