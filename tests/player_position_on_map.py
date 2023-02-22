@@ -23,6 +23,15 @@ def rot_around_y(x_pl, x_cen, x_cor):
         rev = 1
     return ang,rev
 
+def get_intersection(x1,y1,x2,y2,x3,y3,x4,y4):
+    Px = ((x1*y2-y1*x2)*(x3-x4)-(x1-x2)*(x3*y4-y3*x4))/((x1-x2)*(y3-y4)-(y1-y2)*(x3-x4))
+    Py = ((x1*y2-y1*x2)*(y3-y4)-(y1-y2)*(x3*y4-y3*x4))/((x1-x2)*(y3-y4)-(y1-y2)*(x3-x4))
+    return (Px,Py)
+
+def corner_position(lines):
+    return get_intersection(lines[0][0][0],lines[0][0][1],lines[0][1][0],lines[0][1][1],lines[1][0][0],lines[1][0][1],lines[1][1][0],lines[1][1][1])
+    
+
 #assumes coordinates scaled to pinhole distance 1,
 #write function that scales them!
 def get_matrix_rotation(center, corner, player):
@@ -37,4 +46,7 @@ def get_matrix_rotation(center, corner, player):
     R = np.matmul(Rx,Ry)
     return R
 
-
+def intersection_with_xz(pinhole, vec):
+    t = pinhole[1]/vec[1]
+    point = [pinhole[0]-t*vec[0], pinhole[1]-t*vec[1], pinhole[2]-t*vec[2]]
+    return point

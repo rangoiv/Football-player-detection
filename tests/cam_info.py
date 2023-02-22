@@ -1,5 +1,7 @@
-WIDTH_CONST = 0
-HEIGHT_CONST = 0
+import math
+
+WIDTH_CONST = 11.8
+HEIGHT_CONST = 18.2
 
 def average_player_width(width_vec):
     n = len(width_vec)
@@ -26,3 +28,5 @@ def get_field_of_view_horizontal(avg_width):
 def get_field_of_view_vertical(avg_height):
     return HEIGHT_CONST/avg_height
 
+def get_scaled(ang):
+    return 2*math.tan(ang/2)
