@@ -23,7 +23,7 @@ def rot_around_y(x_pl, x_cen, x_cor):
         rev = 1
     return ang,rev
 
-def get_intersection(x1,y1,x2,y2,x3,y3,x4,y4):
+def get_intersection(x1, y1, x2, y2, x3, y3, x4, y4):
     Px = ((x1*y2-y1*x2)*(x3-x4)-(x1-x2)*(x3*y4-y3*x4))/((x1-x2)*(y3-y4)-(y1-y2)*(x3-x4))
     Py = ((x1*y2-y1*x2)*(y3-y4)-(y1-y2)*(x3*y4-y3*x4))/((x1-x2)*(y3-y4)-(y1-y2)*(x3-x4))
     return (Px,Py)
@@ -31,20 +31,33 @@ def get_intersection(x1,y1,x2,y2,x3,y3,x4,y4):
 def corner_position(lines):
     return get_intersection(lines[0][0][0],lines[0][0][1],lines[0][1][0],lines[0][1][1],lines[1][0][0],lines[1][0][1],lines[1][1][0],lines[1][1][1])
     
-
+def scaled_point(w,h,sw,sh,p):
+    px = p[0]*sw/w
+    py = p[1]*sh/h
+    return (px,py)
 #assumes coordinates scaled to pinhole distance 1,
 #write function that scales them!
 def get_matrix_rotation(center, corner, player):
     a_x, b_x = rot_around_x(player[1], center[1], corner[1])
-    Rx = [[1, 0, 0], [0, math.cos(a_x), -math.sin(a_x)], [0, math.sin(a_x), math.cos(a_x)]]
+    Rx = [[1, 0, 0], [0, math.cos(a_x), math.sin(a_x)], [0, -math.sin(a_x), math.cos(a_x)]]
     if b_x:
-        Rx = [[1, 0, 0], [0, math.cos(a_x), math.sin(a_x)], [0, -math.sin(a_x), math.cos(a_x)]]
+        Rx = [[1, 0, 0], [0, math.cos(a_x), -math.sin(a_x)], [0, math.sin(a_x), math.cos(a_x)]]
     a_y, b_y = rot_around_y(player[0], center[0], corner[0])
-    Ry = [[math.cos(a_y), 0, math.sin(a_y)], [0, 1, 0], [-math.sin(a_y), 0, math.cos(a_y)]]
+    Ry = [[math.cos(a_y), 0, -math.sin(a_y)], [0, 1, 0], [math.sin(a_y), 0, math.cos(a_y)]]
     if b_y:
-        Ry = [[math.cos(a_y), 0, -math.sin(a_y)], [0, 1, 0], [math.sin(a_y), 0, math.cos(a_y)]]
+        Ry = [[math.cos(a_y), 0, math.sin(a_y)], [0, 1, 0], [-math.sin(a_y), 0, math.cos(a_y)]]
     R = np.matmul(Rx,Ry)
     return R
+
+def player_pitch_position(center, corner, player):
+    a = np.array(get_matrix_rotation(center, corner, player))
+    b = np.array([50, -10, -75])
+    pin = [0, 10, 45]
+    c = a.dot(b)
+    intersection = intersection_with_xz(pin, c.tolist())
+    print(intersection)
+    return ((intersection[0]+52)/104, (intersection[2]+32)/64)
+    
 
 def intersection_with_xz(pinhole, vec):
     t = pinhole[1]/vec[1]
