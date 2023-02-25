@@ -1,7 +1,7 @@
 import math
 
-WIDTH_CONST = 22
-HEIGHT_CONST = 22
+WIDTH_CONST = 21
+HEIGHT_CONST = 24
 
 def average_player_width(width_vec):
     n = len(width_vec)

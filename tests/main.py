@@ -67,11 +67,13 @@ def main():
             cv2.circle(frame, (x, y), radius=3, color=(0, 0, 255), thickness=-1)
 
         # Draw Lines
+        lft = 0
         for ((x1, y1), (x2, y2), s) in lines:
             if s == 't':
                 col = (0, 0, 255)
             elif s == 'l':
                 col = (0, 255, 0)
+                lft = 1
             else:
                 col = (255, 0, 0)
             cv2.line(frame, (x1, y1), (x2, y2), col, 2)
@@ -88,8 +90,8 @@ def main():
         fov_horizontal = ((frame_number - 1)*fov_horizontal + fh)/frame_number
         fov_vertical = ((frame_number - 1)*fov_vertical + fv)/frame_number
 
-        scaled_width = get_scaled(fov_horizontal)
-        scaled_height = get_scaled(fov_vertical)
+        scaled_width = get_scaled(fh)
+        scaled_height = get_scaled(fv)
 
         if len(lines) > 1:
             print('sta je')
@@ -103,16 +105,19 @@ def main():
             center = (scaled_width/2, scaled_height/2)
             for (x,y) in positions:
                 sx = scaled_point(w, h, scaled_width, scaled_height, (x,y))
-                pos = player_pitch_position(center, s_corner, sx)
+                pos = player_pitch_position(center, s_corner, sx, lft)
+
                 if(pos[0] > 0 and pos[0] < 1 and pos[1] > 0 and pos[1] < 1):
-                    pos=(int(pos[0]*map_sx), int(pos[1]*map_sy))
+                    if lft:
+                        pos=(int((0.4-pos[0])*map_sx), int((1-pos[1])*map_sy))
+                    else:
+                        pos=(int((1.5-pos[0])*map_sx), int((1-pos[1])*map_sy))
                     cv2.circle(pitch_image, pos, radius=5, color=(0, 0, 255), thickness=-1)
         
         concated = concat(frame, pitch_image, 'v')
         cv2.imshow('Match Detection', concated)
 
         frame_number += 1
-
 
 if __name__ == "__main__":
     main()

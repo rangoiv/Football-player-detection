@@ -8,7 +8,7 @@ def rot_around_x(y_pl, y_cen, y_cor):
     rev = 0
     if abs(y_pl-y_cen) > abs(y_pl-y_cen):
         ang = abs(a_pl-a_cor)
-    if y_pl < y_cor:
+    if y_pl > y_cor:
         rev = 1
     return ang,rev
 
@@ -19,7 +19,7 @@ def rot_around_y(x_pl, x_cen, x_cor):
     rev = 0
     if abs(x_pl-x_cen) > abs(x_pl-x_cen):
         ang = abs(a_pl-a_cor)
-    if x_pl > x_cor:
+    if x_pl < x_cor:
         rev = 1
     return ang,rev
 
@@ -39,20 +39,20 @@ def scaled_point(w,h,sw,sh,p):
 #write function that scales them!
 def get_matrix_rotation(center, corner, player):
     a_x, b_x = rot_around_x(player[1], center[1], corner[1])
-    Rx = [[1, 0, 0], [0, math.cos(a_x), math.sin(a_x)], [0, -math.sin(a_x), math.cos(a_x)]]
+    Rx = [[1, 0, 0], [0, math.cos(a_x), -math.sin(a_x)], [0, math.sin(a_x), math.cos(a_x)]]
     if b_x:
-        Rx = [[1, 0, 0], [0, math.cos(a_x), -math.sin(a_x)], [0, math.sin(a_x), math.cos(a_x)]]
+        Rx = [[1, 0, 0], [0, math.cos(a_x), math.sin(a_x)], [0, -math.sin(a_x), math.cos(a_x)]]
     a_y, b_y = rot_around_y(player[0], center[0], corner[0])
-    Ry = [[math.cos(a_y), 0, -math.sin(a_y)], [0, 1, 0], [math.sin(a_y), 0, math.cos(a_y)]]
+    Ry = [[math.cos(a_y), 0, math.sin(a_y)], [0, 1, 0], [-math.sin(a_y), 0, math.cos(a_y)]]
     if b_y:
-        Ry = [[math.cos(a_y), 0, math.sin(a_y)], [0, 1, 0], [-math.sin(a_y), 0, math.cos(a_y)]]
+        Ry = [[math.cos(a_y), 0, -math.sin(a_y)], [0, 1, 0], [math.sin(a_y), 0, math.cos(a_y)]]
     R = np.matmul(Rx,Ry)
     return R
 
-def player_pitch_position(center, corner, player):
+def player_pitch_position(center, corner, player, lft):
     a = np.array(get_matrix_rotation(center, corner, player))
-    b = np.array([50, -10, -75])
-    pin = [0, 10, 45]
+    b = np.array([50-100*lft, -7, -70])
+    pin = [0, 7, 40]
     c = a.dot(b)
     intersection = intersection_with_xz(pin, c.tolist())
     print(intersection)
