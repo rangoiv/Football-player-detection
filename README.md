@@ -1,4 +1,4 @@
-# Football-player-detection
+# Football player detection
 
 ## What it does?
 
@@ -40,6 +40,10 @@ you can install it
 [here](https://developer.nvidia.com/cuda-11-6-0-download-archive?target_os=Windows&target_arch=x86_64&target_version=11)
 It takes long to download, so be patient!
 1. Install Python 3.9.13. Preferably using conda.
+2. Make sure Python is on your path so you can use it later. To check, run `python` in
+your console and make sure the version and installation went fine. To add it to path,
+follow [this](https://www.educative.io/answers/how-to-add-python-to-path-variable-in-windows)
+tutorial.
 1. Install Torch. I have 1.13.1. IMPORTANT! If you installed cuda, you should install
 it with cuda options enabled 
 [here](https://pytorch.org/get-started/locally/)
@@ -49,6 +53,9 @@ it with cuda options enabled
 1. Open terminal on your computer and go to the folder where you wish to install 
 Yolov5 repository
 2. Run `git clone https://github.com/ultralytics/yolov5.git` (from [this repo](https://github.com/ultralytics/yolov5))
+3. Open cloned folder in terminal (using `cd yolov5`)
+4. Run `pip install git+https://github.com/philferriere/cocoapi.git#subdirectory=PythonAPI`
+4. Run `pip install -r requirements.txt`
 
 Very simply you now have Yolov5 installed!
 
